@@ -30,12 +30,12 @@ app.get('/weather', (request, response) => {
   //http://localhost:3003/weather?searchQuery=Seattle
 
   try {
-    // query from request
-    let {searchQuery} = request.query;
+    // destructure query from request
+    let {searchQuery, lat, lon} = request.query;
 
     // find matching city
     let dataToInstantiate = data.find(city => {
-      return city.city_name === searchQuery;
+      return city.city_name === searchQuery || (city.lat === lat && city.lon === lon);
     });
 
     // loop through objects
