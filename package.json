@@ -4,7 +4,8 @@
   "description": "backend for the city explorer app",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "listen": "nodemon city-explorer-api"
   },
   "repository": {
     "type": "git",
