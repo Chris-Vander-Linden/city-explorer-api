@@ -11,7 +11,7 @@ const app = express();
 // pass cors into express app, listen on port
 const cors = require('cors');
 app.use(cors());
-app.listen(PORT, () => console.log(`Listening on PORT ${PORT}`));
+app.listen(PORT, () => console.log(`Listening on...`, `http://localhost:${PORT}/`));
 
 // import practice data
 let data = require('./data/weather.json');
