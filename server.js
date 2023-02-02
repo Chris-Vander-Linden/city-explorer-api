@@ -47,7 +47,7 @@ app.get('/', (request, response) => {
 });
 
 app.get('/weather', (request, response) => {
-  //http://localhost:3003/weather?searchQuery=Seattle
+  //http://localhost:3003/weatherAPI
 
   try {
     // destructure query from request
@@ -78,9 +78,9 @@ app.get('/weatherAPI', (req, res) => {
   const { lat, lon } = req.query;
 
   // default return next 48 hours
-  axios.get(`https://api.weatherbit.io/v2.0/forecast/hourly?lat=${lat}&lon=${lon}&units=[I]&key=${WEATHER_API_KEY}`).then(response => {
+  axios.get(`https://api.weatherbit.io/v2.0/forecast/hourly?lat=${lat}&lon=${lon}&units=I&key=${WEATHER_API_KEY}`).then(response => {
     // you need the timezone to format time of day.
-    console.log(response.data);
+    console.log(response.data.data[0]);
     // loop through objects
     const dataToSend = response.data.data.map(data => new WeatherForecast(data, response.data.timezone));
     //console.log(dataToSend);
@@ -101,10 +101,7 @@ app.get('*', (request, response) => {
 
 /* Movie Routes */
 
-
 /* Food Routes */
-
-
 
 /*** ROUTE END ***/
 
@@ -121,7 +118,7 @@ class Forecast {
 
 class WeatherForecast {
   constructor (weatherObject) {
-    this.time = new Date(weatherObject.timestamp_utc).toLocaleString('en-US', { hour: "numeric" });
+    this.time = new Date(weatherObject.timestamp_local).toLocaleString('en-US', { hour: 'numeric' });
     this.icon = weatherObject.weather.icon;
     this.desc = weatherObject.weather.description;
     this.temp = `${weatherObject.temp} \u2109`;
@@ -138,5 +135,3 @@ class WeatherForecast {
 app.use((error, request, response, next) => {
   response.status(500).send(error.message);
 });
-
-
