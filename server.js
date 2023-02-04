@@ -58,7 +58,7 @@ app.get('/movieAPI', (req, res) => {
   console.log(cityName);
 
   // Get image base path, so I can later form full path
-  axios.get(`https://api.themoviedb.org/3/configuration?api_key=${MOVIE_API_KEY}&`).then(response => {
+  axios.get(`https://api.themoviedb.org/3/configuration?api_key=${MOVIE_API_KEY}`).then(response => {
     const basePathData = { thumb_img_url: response.data.images.base_url + response.data.images.poster_sizes[0], large_img_url: response.data.images.base_url + response.data.images.poster_sizes[response.data.images.poster_sizes.length - 1] };
 
     // Get movie data
