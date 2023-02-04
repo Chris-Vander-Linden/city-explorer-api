@@ -101,7 +101,7 @@ class WeatherForecast {
     this.direction = arrayObject.wind_cdir;
     this.speed = arrayObject.wind_spd + ' MPH';
     this.gust = arrayObject.wind_gust_spd + ' MPH';
-    this.precip = arrayObject.precip;
+    this.precip = arrayObject.precip + '"';
   }
 }
 
@@ -112,8 +112,8 @@ class Movie {
     this.title = arrayObject.title;
     this.cover_large = basePathDataObj.large_img_url + arrayObject.poster_path;
     this.overview = arrayObject.overview;
-    this.vote_average = ((Number.parseInt(arrayObject.vote_average) / 10) * 100) + '%';
-    this.release_date = arrayObject.release_date;
+    this.vote = ((Number.parseInt(arrayObject.vote_average) / 10) * 100) + '%';
+    this.release = arrayObject.release_date;
   }
 }
 
