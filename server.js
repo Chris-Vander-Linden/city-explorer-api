@@ -4,6 +4,7 @@
 require('dotenv').config();
 const PORT = process.env.PORT || 5005;
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
 
 // create express app
 const express = require('express');
@@ -17,81 +18,66 @@ app.listen(PORT, () => console.log(`Listening on...`, `http://localhost:${PORT}/
 // axios for external API
 const axios = require('axios');
 
-
-/*** DATA START ***/
-// import practice data
-let data = require('./data/weather.json');
-
-
-/*** DATA END ***/
-
-
-
-
-
-
-
-
-
-
 /*** ROUTE START ***/
 
-/* (Practice) Weather Routes */
+/* Root Route */
 
 // app instance get method takes path and callback function.
-app.get('/', (request, response) => {
-  //http://localhost:3003/
+app.get('/', (req, res) => {
+  // Local: http://localhost:3003/
+  // Remote: https://city-explorer-api-jqdk.onrender.com/
 
-  //then we need to send something back
-  response.send('Hefffllo from our server HOME route / !!!');
+  // Then we need to send something back.
+  // This prints it to the screen
+  res.send('This is the Home route!!!!');
 });
 
-app.get('/weather', (request, response) => {
-  //http://localhost:3003/weatherAPI
-
-  try {
-    // destructure query from request
-    let { searchQuery, lat, lon } = request.query;
-
-    // find matching city
-    let dataToInstantiate = data.find(city => {
-      return city.city_name === searchQuery || (city.lat === lat && city.lon === lon);
-    });
-
-    // loop through objects
-    let dataToSend = dataToInstantiate.data.map(data => new Forecast(data));
-
-    response.status(200).send(dataToSend);
-
-  } catch (error) {
-    //create a new instance of error
-    //this will instantiate any new error
-    // eslint-disable-next-line no-undef
-    next(error);
-  }
-});
 
 /* Weather API Routes */
 
 app.get('/weatherAPI', (req, res) => {
   console.log(req.query);
   const { lat, lon } = req.query;
-
   // default return next 48 hours
   axios.get(`https://api.weatherbit.io/v2.0/forecast/hourly?lat=${lat}&lon=${lon}&units=I&key=${WEATHER_API_KEY}`).then(response => {
-    // you need the timezone to format time of day.
-    console.log(response.data.data[0]);
     // loop through objects
     const dataToSend = response.data.data.map(data => new WeatherForecast(data, response.data.timezone));
     //console.log(dataToSend);
-    res.status(200).send(dataToSend);
-
-    //res.status(200).send(response.data);
+    // This sends the data as JSON?
+    res.send(dataToSend);
   }).catch(error => {
     res.status(500).send(error);
     console.error(error);
   });
+});
 
+/* Movie Routes */
+app.get('/movieAPI', (req, res) => {
+  const cityName = req.query.cityName;
+
+  console.log(cityName);
+
+  // Get image base path, so I can later form full path
+  axios.get(`https://api.themoviedb.org/3/configuration?api_key=${MOVIE_API_KEY}&`).then(response => {
+    const basePathData = { thumb_img_url: response.data.images.base_url + response.data.images.poster_sizes[0], large_img_url: response.data.images.base_url + response.data.images.poster_sizes[response.data.images.poster_sizes.length - 1] };
+
+    // Get movie data
+    axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${MOVIE_API_KEY}&query=${cityName}`).then(response => {
+      const dataToSend = response.data.results.map(movie => new Movie(movie, basePathData));
+      res.send(dataToSend);
+    }).catch(error => {
+      res.status(500).send(error);
+      console.error(error);
+    });
+  }).catch(error => {
+    res.status(500).send(error);
+    console.error(error);
+  });
+});
+
+/* Food Routes */
+app.get('/foodAPI', (req, res) => {
+  res.send('FoodAPI ROUTE!!!');
 });
 
 // 404 not found path.
@@ -99,36 +85,45 @@ app.get('*', (request, response) => {
   response.status(404).send('The route was not found. Error 404');
 });
 
-/* Movie Routes */
-
-/* Food Routes */
-
 /*** ROUTE END ***/
 
 
 
 
 /* Classes */
-class Forecast {
-  constructor (cityObject) {
-    this.description = cityObject.weather.description;
-    this.date = cityObject.valid_date;
-  }
-}
 
 class WeatherForecast {
-  constructor (weatherObject) {
-    this.time = new Date(weatherObject.timestamp_local).toLocaleString('en-US', { hour: 'numeric' });
-    this.icon = weatherObject.weather.icon;
-    this.desc = weatherObject.weather.description;
-    this.temp = `${weatherObject.temp} \u2109`;
-    this.direction = weatherObject.wind_cdir;
-    this.speed = weatherObject.wind_spd;
-    this.gust = weatherObject.wind_gust_spd;
-    this.precip = weatherObject.precip;
-
+  constructor (arrayObject) {
+    this.time = new Date(arrayObject.timestamp_local).toLocaleString('en-US', { hour: 'numeric' });
+    this.icon = arrayObject.weather.icon;
+    this.desc = arrayObject.weather.description;
+    this.temp = `${arrayObject.temp} \u2109`;
+    this.direction = arrayObject.wind_cdir;
+    this.speed = arrayObject.wind_spd + ' MPH';
+    this.gust = arrayObject.wind_gust_spd + ' MPH';
+    this.precip = arrayObject.precip + '"';
   }
 }
+
+class Movie {
+  constructor (arrayObject, basePathDataObj) {
+    this.id = arrayObject.id;
+    this.cover = basePathDataObj.thumb_img_url + arrayObject.poster_path;
+    this.title = arrayObject.title;
+    this.cover_large = basePathDataObj.large_img_url + arrayObject.poster_path;
+    this.overview = arrayObject.overview;
+    this.vote = ((Number.parseInt(arrayObject.vote_average) / 10) * 100) + '%';
+    this.release = arrayObject.release_date;
+  }
+}
+
+/*
+class Food {
+  constructor (arrayObject) {
+    this.time = arrayObject.timestamp_local;
+  }
+}
+*/
 
 /* Errors */
 // eslint-disable-next-line no-unused-vars
