@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5005;
 const homeResponse = require('./modules/home.js');
 const getWeatherData = require('./modules/weather.js');
 const getMovieData = require('./modules/movies.js');
-const getFoodData = require('./modules/food.js');
+const getYelpData = require('./modules/yelp.js');
 const unknownPageResponse = require('./modules/404');
 
 // create express app
@@ -22,7 +22,7 @@ app.listen(PORT, () => console.log(`Listening on...`, `http://localhost:${PORT}/
 app.get('/', homeResponse);
 app.get('/weatherAPI', getWeatherData);
 app.get('/movieAPI', getMovieData);
-app.get('/foodAPI', getFoodData);
+app.get('/yelp', getYelpData);
 app.get('*', unknownPageResponse);
 
 /* Errors */
