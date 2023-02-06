@@ -15,8 +15,8 @@ const getWeatherData = (req, res) => {
     // This sends the data as JSON?
     res.send(dataToSend);
   }).catch(error => {
-    res.status(500).send(error);
     console.error(error);
+    res.status(500).send(error);
   });
 };
 
