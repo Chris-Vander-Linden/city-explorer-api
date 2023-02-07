@@ -18,13 +18,11 @@ const getYelpData = (req, res) => {
     }
   };
 
-  axios.get(`https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}&sort_by=best_match&limit=50`, options).then(data => {
-    console.log(data.data.businesses);
-
+  axios.get(`https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}&sort_by=distance&limit=10`, options).then(data => {
     const dataToSend = data.data.businesses.map(business => {
       return new Yelp(business);
     });
-
+    console.log(dataToSend);
     res.status(200).send(dataToSend);
   }).catch(err => {
     console.error(err);
@@ -37,16 +35,16 @@ const getYelpData = (req, res) => {
 class Yelp {
   constructor (arrayObject) {
     this.name = arrayObject.name;
-    this.image_url = arrayObject.image_url;
-    this.price = arrayObject.price;
-    this.rating = arrayObject.rating;
+    this.image = arrayObject.image_url;
+    this.price = arrayObject?.price || '-';
+    this.rating = arrayObject.rating + '/5';
     this.url = arrayObject.url;
     this.phone = arrayObject.display_phone;
-    this.address = arrayObject.location.display_address;
-    this.distance = arrayObject.distance;
-    this.categories = arrayObject.categories;
-    this.open = !arrayObject.is_closed;
-    this.transactions = arrayObject.transactions;
+    this.address = arrayObject.location.display_address.join('. ');
+    this.distance = `${(arrayObject.distance / 1600).toFixed(2)} ${arrayObject.distance / 1600 >= 2 ? 'miles' : 'mile'} `;
+    //this.categories = arrayObject.categories;
+    this.hours = !arrayObject.is_closed ? 'open' : 'closed';
+    this.type = arrayObject.transactions.join(', ');
   }
 }
 

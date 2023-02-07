@@ -35,8 +35,8 @@ class Movie {
     this.title = arrayObject.title;
     this.cover_large = basePathDataObj.large_img_url + arrayObject.poster_path;
     this.overview = arrayObject.overview;
-    this.vote = ((Number.parseInt(arrayObject.vote_average) / 10) * 100) + '%';
-    this.release = arrayObject.release_date;
+    this.vote = ((Number.parseInt(arrayObject.vote_average) / 10) * 100);
+    this.release = arrayObject?.release_date || '-';;
   }
 }
 
