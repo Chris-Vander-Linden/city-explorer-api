@@ -4,12 +4,6 @@
 require('dotenv').config();
 const PORT = process.env.PORT || 5005;
 
-const homeResponse = require('./modules/home.js');
-const getWeatherData = require('./modules/weather.js');
-const getMovieData = require('./modules/movies.js');
-const getYelpData = require('./modules/yelp.js');
-const unknownPageResponse = require('./modules/404');
-
 // create express app
 const express = require('express');
 const app = express();
@@ -18,6 +12,12 @@ const app = express();
 const cors = require('cors');
 app.use(cors());
 app.listen(PORT, () => console.log(`Listening on...`, `http://localhost:${PORT}/`));
+
+const homeResponse = require('./modules/home.js');
+const getWeatherData = require('./modules/weather.js');
+const getMovieData = require('./modules/movies.js');
+const getYelpData = require('./modules/yelp.js');
+const unknownPageResponse = require('./modules/404');
 
 app.get('/', homeResponse);
 app.get('/weatherAPI', getWeatherData);
