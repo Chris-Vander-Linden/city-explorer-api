@@ -31,8 +31,8 @@ const getMovieData = (req, res) => {
 class Movie {
   constructor (arrayObject, basePathDataObj) {
     this.id = arrayObject.id;
-    this.cover = basePathDataObj.thumb_img_url + arrayObject.poster_path;
     this.title = arrayObject.title;
+    this.cover = basePathDataObj.thumb_img_url + arrayObject.poster_path;
     this.cover_large = basePathDataObj.large_img_url + arrayObject.poster_path;
     this.overview = arrayObject.overview;
     this.vote = ((Number.parseInt(arrayObject.vote_average) / 10) * 100);
