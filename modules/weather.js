@@ -4,6 +4,8 @@ const axios = require('axios');
 const cache = require('./cache');
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
+const timeToCache = 1000 * 60 * 60; // 1 hour
+
 const getWeatherData = (req, res) => {
 
   // for axios
@@ -11,9 +13,6 @@ const getWeatherData = (req, res) => {
 
   // for cache
   const key = `weather-${lat}-${lon}-data`;
-
-
-  const timeToCache = 1000 * 20; // 20 seconds
 
   if (cache[key] && (Date.now() - cache[key].timeStamp) < timeToCache) {
     res.status(200).send(cache[key]);

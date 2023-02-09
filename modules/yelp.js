@@ -2,31 +2,52 @@
 
 // axios for external API
 const axios = require('axios');
-
+const cache = require('./cache');
 const YELP_API_KEY = process.env.YELP_API_KEY;
+
+const timeToCache = 1000 * 60 * 60; // 1 hour
 
 /* Movie Routes */
 const getYelpData = (req, res) => {
+
+  // for axios
   const { lat, lon } = req.query;
 
-  const options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      Authorization: YELP_API_KEY
-    }
-  };
+  // for cache
+  const key = `weather-${lat}-${lon}-data`;
 
-  axios.get(`https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}&sort_by=distance&limit=10`, options).then(data => {
-    const dataToSend = data.data.businesses.map(business => (
-      new Yelp(business)
-    ));
-    res.status(200).send(dataToSend);
-  }).catch(err => {
-    console.error(err);
-    res.status(500).send(err);
-  });
-};
+
+
+
+  if (cache[key] && (Date.now() - cache[key].timeStamp) < timeToCache) {
+    res.status(200).send(cache[key]);
+  } else {
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: YELP_API_KEY
+      }
+    };
+
+    axios.get(`https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}&sort_by=distance&limit=10`, options).then(data => {
+      const dataToSend = data.data.businesses.map(business => (
+        new Yelp(business)
+      ));
+
+      //add to cache
+      cache[key] = {
+        data: dataToSend,
+        timeStamp: Date.now()
+      };
+
+      res.send(cache[key]);
+    }).catch(err => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  };
+}
 
 class Yelp {
   constructor (arrayObject) {
