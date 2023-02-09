@@ -27,7 +27,6 @@ const getMovieData = (req, res) => {
   });
 };
 
-
 class Movie {
   constructor (arrayObject, basePathDataObj) {
     this.id = arrayObject.id;

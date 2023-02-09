@@ -8,7 +8,6 @@ const YELP_API_KEY = process.env.YELP_API_KEY;
 /* Movie Routes */
 const getYelpData = (req, res) => {
   const { lat, lon } = req.query;
-  console.log(lat, lon);
 
   const options = {
     method: 'GET',
@@ -19,18 +18,15 @@ const getYelpData = (req, res) => {
   };
 
   axios.get(`https://api.yelp.com/v3/businesses/search?latitude=${lat}&longitude=${lon}&sort_by=distance&limit=10`, options).then(data => {
-    const dataToSend = data.data.businesses.map(business => {
-      return new Yelp(business);
-    });
-    console.log(dataToSend);
+    const dataToSend = data.data.businesses.map(business => (
+      new Yelp(business)
+    ));
     res.status(200).send(dataToSend);
   }).catch(err => {
     console.error(err);
     res.status(500).send(err);
   });
 };
-
-
 
 class Yelp {
   constructor (arrayObject) {

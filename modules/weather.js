@@ -1,23 +1,40 @@
 'use strict';
 
-// axios for external API
 const axios = require('axios');
-
+const cache = require('./cache');
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 const getWeatherData = (req, res) => {
+
+  // for axios
   const { lat, lon } = req.query;
-  // default return next 48 hours
-  axios.get(`https://api.weatherbit.io/v2.0/forecast/hourly?lat=${lat}&lon=${lon}&units=I&key=${WEATHER_API_KEY}`).then(response => {
-    // loop through objects
-    const dataToSend = response.data.data.map(data => new WeatherForecast(data, response.data.timezone));
-    //console.log(dataToSend);
-    // This sends the data as JSON?
-    res.send(dataToSend);
-  }).catch(error => {
-    console.error(error);
-    res.status(500).send(error);
-  });
+
+  // for cache
+  const key = `weather-${lat}-${lon}-data`;
+
+
+  const timeToCache = 1000 * 20; // 20 seconds
+
+  if (cache[key] && (Date.now() - cache[key].timeStamp) < timeToCache) {
+    res.status(200).send(cache[key]);
+  } else {
+    // default return next 48 hours
+    axios.get(`https://api.weatherbit.io/v2.0/forecast/hourly?lat=${lat}&lon=${lon}&units=I&key=${WEATHER_API_KEY}`).then(response => {
+      // loop through objects
+      const dataToSend = response.data.data.map(data => new WeatherForecast(data));
+
+      //add to cache
+      cache[key] = {
+        data: dataToSend,
+        timeStamp: Date.now()
+      };
+
+      res.send(cache[key]);
+    }).catch(error => {
+      console.error(error);
+      res.status(500).send(error);
+    });
+  }
 };
 
 class WeatherForecast {
