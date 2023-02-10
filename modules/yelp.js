@@ -5,7 +5,7 @@ const axios = require('axios');
 const cache = require('./cache');
 const YELP_API_KEY = process.env.YELP_API_KEY;
 
-const timeToCache = 1000 * 60 * 60; // 1 hour
+const timeToCache = 1000 * 60 * 15; // 15 minutes
 
 /* Movie Routes */
 const getYelpData = (req, res) => {
@@ -14,9 +14,7 @@ const getYelpData = (req, res) => {
   const { lat, lon } = req.query;
 
   // for cache
-  const key = `weather-${lat}-${lon}-data`;
-
-
+  const key = `yelp-${lat}-${lon}-data`;
 
 
   if (cache[key] && (Date.now() - cache[key].timeStamp) < timeToCache) {
