@@ -17,6 +17,8 @@ const getWeatherData = (req, res) => {
   if (cache[key] && (Date.now() - cache[key].timeStamp) < timeToCache) {
     res.status(200).send(cache[key]);
   } else {
+    // delete old cache
+    delete cache[key];
     // default return next 48 hours
     axios.get(`https://api.weatherbit.io/v2.0/forecast/hourly?lat=${lat}&lon=${lon}&units=I&key=${WEATHER_API_KEY}`).then(response => {
       // loop through objects
